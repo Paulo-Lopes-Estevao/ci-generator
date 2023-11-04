@@ -11,11 +11,11 @@ Possible CI systems are:
 
 They can integrate with the following tools:
 
-- [ ] SonarQube
-- [ ] SonarCloud
-- [ ] Test coverage
-- [ ] DockerFile
-- [ ] DockerCompose
+- SonarQube
+- SonarCloud
+- Test coverage
+- DockerFile
+- DockerCompose
 
 ## Installation
 
