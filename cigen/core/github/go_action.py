@@ -1,9 +1,192 @@
+from __future__ import annotations
+
+import inspect
 import yaml
-from cigen.core.github.github_action import On, Steps
+from cigen.core.github.github_action import Steps, OnEvent
+from abc import ABC, abstractmethod
+
+
+class GoActionBuilder(ABC):
+
+    @property
+    @abstractmethod
+    def build(self) -> GoAction:
+        pass
+
+    @property
+    @abstractmethod
+    def build_steps(self) -> GoActionSteps:
+        pass
+
+    @abstractmethod
+    def base(self) -> None:
+        pass
+
+    @abstractmethod
+    def base_version_list(self) -> None:
+        pass
+
+    def add_steps(self, step):
+        pass
+
+    @abstractmethod
+    def base_to_yaml(self) -> None:
+        pass
+
+    @abstractmethod
+    def run(self) -> None:
+        pass
+
+    @abstractmethod
+    def run_with_env(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_checkout(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_setup_go(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_setup_go_with_version_list(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_cache(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_install_dependencies(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_tests(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_tests_and_coverage(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_tests_and_coverage_with_coverage(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_tests_and_coverage_with_coverage_and_html(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_tests_and_coverage_with_coverage_and_html_and_upload(self) -> None:
+        pass
+
+    @abstractmethod
+    def step_run_build(self) -> None:
+        pass
+
+    @abstractmethod
+    def version_list_default(self) -> None:
+        pass
+
+    @abstractmethod
+    def set_version(self, param):
+        pass
+
+    def list_steps(self):
+        pass
+
+
+class GoActionBuilderImpl(GoActionBuilder):
+    def __init__(self, name, version, on, env=None) -> None:
+        self._steps = None
+        self._build = None
+        self.name = name
+        self.version = version
+        self.on = on
+        self.env = env
+        self.step = Steps([])
+        self.reset()
+        self.reset_steps()
+
+    def reset(self):
+        self._build = GoAction(self.name, self.version, self.on, self.step, self.env)
+
+    def reset_steps(self):
+        self._steps = GoActionSteps(self.version)
+
+    @property
+    def build_steps(self):
+        build_steps = self._steps
+        self.reset_steps()
+        return build_steps
+
+    def add_steps(self, step):
+        return self.step.add(step)
+
+    @property
+    def build(self):
+        build = self._build
+        self.reset()
+        return build
+
+    def base(self):
+        return self._build.base()
+
+    def base_version_list(self):
+        return self._build.base_version_list()
+
+    def base_to_yaml(self):
+        return self._build.base_to_yaml()
+
+    def run(self):
+        return self._build.run()
+
+    def run_with_env(self):
+        self.step.add(self._build.run_with_env())
+
+    def step_checkout(self):
+        self.step.add_at(self._steps.step_checkout(), 0)
+
+    def step_setup_go(self):
+        self.step.add_at(self._steps.step_setup_go(), 1)
+
+    def step_setup_go_with_version_list(self):
+        self.step.add(self._steps.step_setup_go_with_version_list())
+
+    def step_run_cache(self):
+        self.step.add(self._steps.step_run_cache())
+
+    def step_run_install_dependencies(self):
+        self.step.add(self._steps.step_run_install_dependencies())
+
+    def step_run_tests(self):
+        self.step.add(self._steps.step_run_tests())
+
+    def step_run_tests_and_coverage(self):
+        self.step.add(self._steps.step_run_tests_and_coverage())
+
+    def step_run_tests_and_coverage_with_coverage(self):
+        self.step.add(self._steps.step_run_tests_and_coverage_with_coverage())
+
+    def step_run_tests_and_coverage_with_coverage_and_html(self):
+        self.step.add(self._steps.step_run_tests_and_coverage_with_coverage_and_html())
+
+    def step_run_tests_and_coverage_with_coverage_and_html_and_upload(self):
+        self.step.add(self._steps.step_run_tests_and_coverage_with_coverage_and_html_and_upload())
+
+    def step_run_build(self):
+        self.step.add(self._steps.step_run_build())
+
+    def version_list_default(self):
+        self._steps.version_list_default()
+
+    def set_version(self, param):
+        self._steps.version = param
 
 
 class GoAction:
-    on: On
+    on: OnEvent
     steps: Steps
 
     def __init__(self, name, version, on, steps: Steps, env=None) -> None:
@@ -50,13 +233,11 @@ class GoAction:
     def run(self):
         return self.base()
 
-    def runWithEnv(self):
+    def run_with_env(self):
         return {
             **self.base(),
             'env': self.env
         }
-
-
 
 
 class GoActionSteps:
@@ -66,13 +247,13 @@ class GoActionSteps:
         self.version = version
 
     @staticmethod
-    def stepCheckout():
+    def step_checkout():
         return {
             'name': 'Checkout',
             'uses': 'actions/checkout@v4'
         }
 
-    def stepSetupGo(self):
+    def step_setup_go(self):
         if self.version is list:
             raise Exception('Version size must be 1 using Version range')
 
@@ -84,15 +265,15 @@ class GoActionSteps:
             }
         }
 
-    def stepSetupGoWithVersionList(self):
+    def step_setup_go_with_version_list(self):
         return {
             'strategy': {
                 'matrix': {
-                    'go-version': self.version if self.version is None else self.VersionListDefault()
+                    'go-version': self.version if self.version is None else self.version_list_default()
                 }
             },
             'steps': [
-                self.stepCheckout(),
+                self.step_checkout(),
                 {
                     'name': 'Setup Go',
                     'uses': 'actions/setup-go@v4',
@@ -104,7 +285,7 @@ class GoActionSteps:
         }
 
     @staticmethod
-    def stepRunCache():
+    def step_run_cache():
         return {
             'name': 'Cache',
             'uses': 'actions/cache@v2',
@@ -115,54 +296,84 @@ class GoActionSteps:
         }
 
     @staticmethod
-    def stepRunInstallDependencies():
+    def step_run_install_dependencies():
         return {
             'name': 'Install Dependencies',
             'run': 'go mod download'
         }
 
     @staticmethod
-    def stepRunTests():
+    def step_run_tests():
         return {
             'name': 'Run Tests',
             'run': 'go test ./...'
         }
 
     @staticmethod
-    def stepRunTestsAndCoverage():
+    def step_run_tests_and_coverage():
         return {
             'name': 'Run Tests and Coverage',
             'run': 'go test ./... -coverprofile=coverage.out'
         }
 
     @staticmethod
-    def stepRunTestsAndCoverageWithCoverage():
+    def step_run_tests_and_coverage_with_coverage():
         return {
             'name': 'Run Tests and Coverage',
             'run': 'go test ./... -coverprofile=coverage.out && go tool cover -func=coverage.out'
         }
 
     @staticmethod
-    def stepRunTestsAndCoverageWithCoverageAndHtml():
+    def step_run_tests_and_coverage_with_coverage_and_html():
         return {
             'name': 'Run Tests and Coverage',
             'run': 'go test ./... -coverprofile=coverage.out && go tool cover -html=coverage.out'
         }
 
     @staticmethod
-    def stepRunTestsAndCoverageWithCoverageAndHtmlAndUpload():
+    def step_run_tests_and_coverage_with_coverage_and_html_and_upload():
         return {
             'name': 'Run Tests and Coverage',
-            'run': 'go test ./... -coverprofile=coverage.out && go tool cover -html=coverage.out && bash <(curl -s https://codecov.io/bash)'
+            'run': 'go test ./... -coverprofile=coverage.out && go tool cover -html=coverage.out && bash <(curl -s '
+                   'https://codecov.io/bash)'
         }
 
     @staticmethod
-    def stepRunBuild():
+    def step_run_build():
         return {
             'name': 'Build',
             'run': 'go build ./...'
         }
 
     @staticmethod
-    def VersionListDefault():
+    def version_list_default():
         return ['1.19', '1.20', '1.21.x']
+
+
+class ActionCIGenGolang:
+
+    def __init__(self):
+        self._builder = None
+
+    def __int__(self):
+        self._builder = None
+
+    @property
+    def builder(self) -> GoActionBuilder:
+        return self._builder
+
+    @builder.setter
+    def builder(self, builder: GoActionBuilder) -> None:
+        self._builder = builder
+
+    def action_build_base(self):
+        return self.builder.base()
+
+    def action_build_base_version_list(self):
+        return self.builder.base_version_list()
+
+    def _list_steps(self):
+        return self.builder.list_steps()
+
+    def action_steps_run_build(self):
+        self.builder.add_steps(self.builder.step_run_build())
