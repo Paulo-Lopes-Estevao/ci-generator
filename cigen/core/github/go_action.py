@@ -54,6 +54,10 @@ class GoActionBuilder(ABC):
         pass
 
     @abstractmethod
+    def step_setup_go_with_versions_matrix(self) -> None:
+        pass
+
+    @abstractmethod
     def step_run_cache(self) -> None:
         pass
 
@@ -154,6 +158,9 @@ class GoActionBuilderImpl(GoActionBuilder):
     def step_setup_go_with_version_list(self):
         self.step.add(self._steps.step_setup_go_with_version_list())
 
+    def step_setup_go_with_versions_matrix(self):
+        self.step.add_at(self._steps.step_setup_go_with_versions_matrix(), 1)
+
     def step_run_cache(self):
         self.step.add(self._steps.step_run_cache())
 
@@ -197,9 +204,11 @@ class GoAction:
         self.env = env
 
     def base(self):
+        print(self.on)
+
         return {
             'name': self.name,
-            'on': self.on,
+            "on": self.on,
             'jobs': {
                 'build': {
                     'name': 'Build',
@@ -210,6 +219,9 @@ class GoAction:
         }
 
     def base_version_list(self):
+        if self.version == [] or self.version == "" or self.version is None:
+            self.version = ['1.19', '1.20', '1.21.x']
+
         return {
             'name': self.name,
             'on': self.on,
@@ -226,6 +238,20 @@ class GoAction:
                 }
             }
         }
+
+    def order_json(self, json_obj, ordem):
+        ordered_json = {key: json_obj[key] for key in ordem if key in json_obj}
+
+        remaining_keys = [key for key in json_obj if key not in ordem]
+        ordered_json.update({key: json_obj[key] for key in remaining_keys})
+
+        for key, value in ordered_json.items():
+            if isinstance(value, dict):
+                ordered_json[key] = self.order_json(value, ordem)
+            elif isinstance(value, list):
+                ordered_json[key] = [self.order_json(item, ordem) if isinstance(item, dict) else item for item in value]
+
+        return ordered_json
 
     def base_to_yaml(self):
         return yaml.dump(self.base())
@@ -282,6 +308,16 @@ class GoActionSteps:
                     }
                 },
             ]
+        }
+
+    @staticmethod
+    def step_setup_go_with_versions_matrix():
+        return {
+            'name': 'Setup Go',
+            'uses': 'actions/setup-go@v4',
+            'with': {
+                'go-version': '${{ matrix.go-version }}'
+            }
         }
 
     @staticmethod
@@ -369,11 +405,12 @@ class ActionCIGenGolang:
     def action_build_base(self):
         return self.builder.base()
 
-    def action_build_base_version_list(self):
+    def action_build_base_with_version_list(self):
         return self.builder.base_version_list()
 
     def _list_steps(self):
         return self.builder.list_steps()
 
-    def action_steps_run_build(self):
+    def _action_steps_run_build(self):
         self.builder.add_steps(self.builder.step_run_build())
+

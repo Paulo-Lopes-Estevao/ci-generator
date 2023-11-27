@@ -1,4 +1,6 @@
 import unittest
+
+from cigen.adapter.output.github_out.file_action import generate_action
 from cigen.core.github.go_action import GoAction, GoActionSteps, ActionCIGenGolang, GoActionBuilderImpl
 from cigen.core.github.github_action import On, Steps, Push, PullRequest, OnEventFactory
 
@@ -32,7 +34,7 @@ class GoActionTestCase(unittest.TestCase):
         )
 
         self.assertEqual(go_action.base(), {
-            'name': 'Go Action',
+            'name': 'Go Actions',
             'on': {
                 'push': {
                     'branches': ['main']
@@ -119,6 +121,8 @@ class GoActionTestCase(unittest.TestCase):
             on.on_push(),
             steps,
         )
+
+        print(go_action.base_version_list())
 
         self.assertEqual(go_action.base_version_list(), {
             'name': 'Go Action',
@@ -230,6 +234,63 @@ class GoActionTestCase(unittest.TestCase):
                             'uses': 'actions/setup-go@v4',
                             'with': {
                                 'go-version': '1.17'
+                            }
+                        },
+                        {
+                            'name': 'Build',
+                            'run': 'go build ./...'
+                        }
+                    ]
+                }
+            }
+        })
+
+    def test_action_ci_build_base_with_version_list_push_and_pull_request(self):
+        action_ciGen_golang = ActionCIGenGolang()
+
+        on_events = OnEventFactory.create_events({
+            'push': {
+                'branches': ['main', 'master']
+            },
+            'pull_request': {
+                'branches': ['main', 'master']
+            }
+        })
+
+        action_ciGen_golang.builder = GoActionBuilderImpl('Go Action', ['1.17', '1.18', '1.19'], on_events)
+        action_ciGen_golang.builder.step_checkout()
+        action_ciGen_golang.builder.step_setup_go_with_versions_matrix()
+        action_ciGen_golang.builder.step_run_build()
+
+        self.assertEqual(action_ciGen_golang.action_build_base_with_version_list(), {
+            'name': 'Go Action',
+            'on': {
+                'push': {
+                    'branches': ['main', 'master']
+                },
+                'pull_request': {
+                    'branches': ['main', 'master']
+                }
+            },
+            'jobs': {
+                'build': {
+                    'name': 'Build',
+                    'runs-on': 'ubuntu-latest',
+                    'strategy': {
+                        'matrix': {
+                            'go-version': ['1.17', '1.18', '1.19']
+                        }
+                    },
+                    'steps': [
+                        {
+                            'name': 'Checkout',
+                            'uses': 'actions/checkout@v4'
+                        },
+                        {
+                            'name': 'Setup Go',
+                            'uses': 'actions/setup-go@v4',
+                            'with': {
+                                'go-version': '${{ matrix.go-version }}'
                             }
                         },
                         {
