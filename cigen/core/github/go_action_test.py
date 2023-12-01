@@ -33,7 +33,7 @@ class GoActionTestCase(unittest.TestCase):
         )
 
         self.assertEqual(go_action.base(), {
-            'name': 'Go Actions',
+            'name': 'Go Action',
             'on': {
                 'push': {
                     'branches': ['main']
