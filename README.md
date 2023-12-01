@@ -38,6 +38,23 @@ cigen --help
 cigen github-actions --help
 ```
 
+output:
+```bash
+Usage: cigen [OPTIONS] COMMAND [ARGS]...
+
+  ciGen is a Continuous Integration Generator
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  docker         This is the main command for the Docker
+  github-action  This is the main command for the GitHub Actions
+  gitlab         This is the main command for the GitLab
+  jenkins        This is the main command for the Jenkins
+
+```
+
 github-actions subcommand can be used to generate Build and Test Github Actions configuration files.
 
 github-actions Golang example:
@@ -105,6 +122,11 @@ gitlab-ci Python example:
 ```bash
 cigen gitlab-ci python -n myproject -b push main -a 1 -v 3.9.6
 ```
+
+<br>
+<br>
+
+**NOTE**: ci generator is not yet fully stable, so it's not recommended to use it in production. It's still in development.
 
 ## Contributing
 
