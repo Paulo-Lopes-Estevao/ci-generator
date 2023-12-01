@@ -4,7 +4,7 @@ with open('README.md') as fh:
     README = fh.read()
 
 setup(
-    name='cigen',
+    name='ci-generator',
     version='0.1.0',
     description='A Continuous Integration Generator',
     author='Paulo Lopes Estevao',
