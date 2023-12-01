@@ -1,6 +1,5 @@
 import unittest
 
-from cigen.adapter.output.github_out.file_action import generate_action
 from cigen.core.github.go_action import GoAction, GoActionSteps, ActionCIGenGolang, GoActionBuilderImpl
 from cigen.core.github.github_action import On, Steps, Push, PullRequest, OnEventFactory
 

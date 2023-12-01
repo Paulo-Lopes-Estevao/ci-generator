@@ -206,7 +206,7 @@ class GoAction:
     def base(self):
         print(self.on)
 
-        return {
+        action_base = {
             'name': self.name,
             "on": self.on,
             'jobs': {
@@ -217,12 +217,13 @@ class GoAction:
                 }
             }
         }
+        return self.order_json(action_base, ['name', 'on', 'jobs'])
 
     def base_version_list(self):
         if self.version == [] or self.version == "" or self.version is None:
             self.version = ['1.19', '1.20', '1.21.x']
 
-        return {
+        action_base = {
             'name': self.name,
             'on': self.on,
             'jobs': {
@@ -238,6 +239,7 @@ class GoAction:
                 }
             }
         }
+        return self.order_json(action_base, ['name', 'on', 'jobs'])
 
     def order_json(self, json_obj, ordem):
         ordered_json = {key: json_obj[key] for key in ordem if key in json_obj}
