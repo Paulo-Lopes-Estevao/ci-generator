@@ -16,6 +16,7 @@ setup(
         'rich',
     ],
     license='MIT',
+    long_description_content_type="text/markdown",
     long_description=README,
     url='https://github.com/Paulo-Lopes-Estevao/ci-generator',
     entry_points={
