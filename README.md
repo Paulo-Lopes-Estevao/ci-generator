@@ -57,6 +57,10 @@ Commands:
 
 github-actions subcommand can be used to generate Build and Test Github Actions configuration files.
 
+#### Github Actions commands available
+
+- go
+
 github-actions Golang example:
 
 ```bash
@@ -68,6 +72,8 @@ github-actions Python example:
 ```bash
 cigen github-actions python -n myproject -b push main -a 1 -v 3.9.6
 ```
+
+## Commands not yet available
 
 ### Jenkins
 
