@@ -109,7 +109,8 @@ class GoActionTestCase(unittest.TestCase):
         go_action_steps = GoActionSteps(['1.19'])
 
         steps = Steps([
-            go_action_steps.step_setup_go_with_version_list()['steps'],
+            go_action_steps.step_checkout(),
+            go_action_steps.step_setup_go_with_versions_matrix(),
             go_action_steps.step_run_build(),
             go_action_steps.step_run_tests(),
         ])
@@ -120,8 +121,6 @@ class GoActionTestCase(unittest.TestCase):
             on.on_push(),
             steps,
         )
-
-        print(go_action.base_version_list())
 
         self.assertEqual(go_action.base_version_list(), {
             'name': 'Go Action',
@@ -140,7 +139,8 @@ class GoActionTestCase(unittest.TestCase):
                         }
                     },
                     'steps': [
-                        go_action_steps.step_setup_go_with_version_list()['steps'],
+                        go_action_steps.step_checkout(),
+                        go_action_steps.step_setup_go_with_versions_matrix(),
                         go_action_steps.step_run_build(),
                         go_action_steps.step_run_tests(),
                     ]
