@@ -2,17 +2,14 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 
-import yaml
-
-from cigen.core.github.base_action import base_action, base_version_list_action
-from cigen.core.github.github_action import OnEvent, Steps
+from cigen.core.github.github_action import Steps, Action
 
 
 class NodejsActionBuilder(ABC):
 
     @property
     @abstractmethod
-    def build(self) -> NodejsAction:
+    def build(self) -> Action:
         pass
 
     @property
@@ -102,7 +99,7 @@ class NodejsActionBuilderImpl(NodejsActionBuilder):
         self.reset_steps()
 
     def reset(self):
-        self._build = NodejsAction(self.name, self.version, self.on, self.step, self.env)
+        self._build = Action(self.name, self.version, self.on, self.step, self.env)
 
     def reset_steps(self):
         self._steps = NodejsActionSteps(self.version)
@@ -195,41 +192,11 @@ class NodejsActionBuilderImpl(NodejsActionBuilder):
         self._steps.version = param
 
 
-class NodejsAction:
-    on: OnEvent
-    steps: Steps
-
-    def __init__(self, name, version, on, steps: Steps, env=None) -> None:
-        self.name = name
-        self.version = version
-        self.on = on
-        self.steps = steps
-        self.env = env
-
-    def base(self):
-        return base_action(self.name, self.on, self.steps)
-
-    def base_version_list(self):
-        return base_version_list_action(self.name, self.on, self.steps, self.version)
-
-    def base_to_yaml(self):
-        return yaml.dump(self.base())
-
-    def run(self):
-        return self.base()
-
-    def run_with_env(self):
-        return {
-            **self.base(),
-            'env': self.env
-        }
-
-
 class NodejsActionSteps:
 
     def __init__(self, version) -> None:
         if version is None:
-            raise Exception("Version is required")
+            raise TypeError("Version is required")
         self.version = version
 
     @staticmethod
@@ -363,7 +330,7 @@ class ActionCIGenNodejs:
         return self.builder.run_with_env()
 
     def action_build_steps(self):
-        return self.builder.build_steps
+        return self.builder.add_steps(self.builder.build_steps)
 
     def build_base(self):
         self.builder.step_checkout()

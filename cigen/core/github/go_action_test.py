@@ -1,7 +1,7 @@
 import unittest
 
-from cigen.core.github.go_action import GoAction, GoActionSteps, ActionCIGenGolang, GoActionBuilderImpl
-from cigen.core.github.github_action import On, Steps, Push, PullRequest, OnEventFactory
+from cigen.core.github.go_action import GoActionSteps, ActionCIGenGolang, GoActionBuilderImpl
+from cigen.core.github.github_action import On, Steps, Push, PullRequest, OnEventFactory, Action
 
 
 class GoActionTestCase(unittest.TestCase):
@@ -22,7 +22,7 @@ class GoActionTestCase(unittest.TestCase):
             go_action_steps.step_run_tests(),
         ])
 
-        go_action = GoAction(
+        go_action = Action(
             'Go Action',
             go_action_steps.version,
             on.to_dict(),
@@ -70,7 +70,7 @@ class GoActionTestCase(unittest.TestCase):
             go_action_steps.step_run_tests(),
         ])
 
-        go_action = GoAction(
+        go_action = Action(
             'Go Action',
             go_action_steps.version,
             on.on_push(),
@@ -115,7 +115,7 @@ class GoActionTestCase(unittest.TestCase):
             go_action_steps.step_run_tests(),
         ])
 
-        go_action = GoAction(
+        go_action = Action(
             'Go Action',
             go_action_steps.version,
             on.on_push(),

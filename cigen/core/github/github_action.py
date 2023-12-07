@@ -4,6 +4,8 @@ import inspect
 import yaml
 from abc import ABC
 
+from cigen.core.github.base_action import base_version_list_action, base_action
+
 
 class Push:
     branches: list[str]
@@ -237,3 +239,33 @@ class Steps:
 
     def to_yaml(self):
         return yaml.dump(self.to_dict())
+
+
+class Action:
+    on: OnEvent
+    steps: Steps
+
+    def __init__(self, name, version, on, steps: Steps, env=None) -> None:
+        self.name = name
+        self.version = version
+        self.on = on
+        self.steps = steps
+        self.env = env
+
+    def base(self):
+        return base_action(self.name, self.on, self.steps)
+
+    def base_version_list(self):
+        return base_version_list_action(self.name, self.on, self.steps, self.version)
+
+    def base_to_yaml(self):
+        return yaml.dump(self.base())
+
+    def run(self):
+        return self.base()
+
+    def run_with_env(self):
+        return {
+            **self.base(),
+            'env': self.env
+        }

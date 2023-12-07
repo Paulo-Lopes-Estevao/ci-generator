@@ -1,7 +1,7 @@
 import unittest
 
-from cigen.core.github.github_action import On, Push, PullRequest, Steps, OnEventFactory
-from cigen.core.github.nodejs_action import NodejsActionSteps, NodejsAction, ActionCIGenNodejs, NodejsActionBuilderImpl
+from cigen.core.github.github_action import On, Push, PullRequest, Steps, OnEventFactory, Action
+from cigen.core.github.nodejs_action import NodejsActionSteps, ActionCIGenNodejs, NodejsActionBuilderImpl
 
 
 class NodejsTestCase(unittest.TestCase):
@@ -26,7 +26,7 @@ class NodejsTestCase(unittest.TestCase):
 
         steps = self.steps_base
 
-        node_action = NodejsAction(
+        node_action = Action(
             self.name,
             self.node_action_steps.version,
             self.on.to_dict(),
@@ -65,7 +65,7 @@ class NodejsTestCase(unittest.TestCase):
 
         steps = self.steps_base
 
-        node_action = NodejsAction(
+        node_action = Action(
             self.name,
             self.node_action_steps.version,
             self.on.to_dict(),
@@ -114,7 +114,7 @@ class NodejsTestCase(unittest.TestCase):
             node_action_steps.step_test(),
         ])
 
-        node_action = NodejsAction(
+        node_action = Action(
             self.name,
             node_action_steps.version,
             self.on.to_dict(),
