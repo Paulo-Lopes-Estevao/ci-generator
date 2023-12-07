@@ -1,7 +1,7 @@
 import unittest
 
-from cigen.core.github.go_action import GoAction, GoActionSteps, ActionCIGenGolang, GoActionBuilderImpl
-from cigen.core.github.github_action import On, Steps, Push, PullRequest, OnEventFactory
+from cigen.core.github.go_action import GoActionSteps, ActionCIGenGolang, GoActionBuilderImpl
+from cigen.core.github.github_action import On, Steps, Push, PullRequest, OnEventFactory, Action
 
 
 class GoActionTestCase(unittest.TestCase):
@@ -22,7 +22,7 @@ class GoActionTestCase(unittest.TestCase):
             go_action_steps.step_run_tests(),
         ])
 
-        go_action = GoAction(
+        go_action = Action(
             'Go Action',
             go_action_steps.version,
             on.to_dict(),
@@ -70,7 +70,7 @@ class GoActionTestCase(unittest.TestCase):
             go_action_steps.step_run_tests(),
         ])
 
-        go_action = GoAction(
+        go_action = Action(
             'Go Action',
             go_action_steps.version,
             on.on_push(),
@@ -109,19 +109,18 @@ class GoActionTestCase(unittest.TestCase):
         go_action_steps = GoActionSteps(['1.19'])
 
         steps = Steps([
-            go_action_steps.step_setup_go_with_version_list()['steps'],
+            go_action_steps.step_checkout(),
+            go_action_steps.step_setup_go_with_versions_matrix(),
             go_action_steps.step_run_build(),
             go_action_steps.step_run_tests(),
         ])
 
-        go_action = GoAction(
+        go_action = Action(
             'Go Action',
             go_action_steps.version,
             on.on_push(),
             steps,
         )
-
-        print(go_action.base_version_list())
 
         self.assertEqual(go_action.base_version_list(), {
             'name': 'Go Action',
@@ -140,7 +139,8 @@ class GoActionTestCase(unittest.TestCase):
                         }
                     },
                     'steps': [
-                        go_action_steps.step_setup_go_with_version_list()['steps'],
+                        go_action_steps.step_checkout(),
+                        go_action_steps.step_setup_go_with_versions_matrix(),
                         go_action_steps.step_run_build(),
                         go_action_steps.step_run_tests(),
                     ]
