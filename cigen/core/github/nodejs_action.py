@@ -207,6 +207,9 @@ class NodejsActionSteps:
         }
 
     def step_setup_node(self):
+        if self.version is list:
+            raise Exception('Version size must be 1 using Version range')
+
         return {
             'name': 'Setup Node',
             'uses': 'actions/setup-node@v4',
