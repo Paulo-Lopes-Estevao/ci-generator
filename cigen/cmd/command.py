@@ -5,7 +5,6 @@ from cigen.adapter.input.jenkins_command import jenkins_group
 from cigen.adapter.input.docker_command import docker_group
 
 
-
 @click.group()
 def cli():
     """
