@@ -55,6 +55,8 @@ Commands:
 
 ```
 
+### [[EXEMPLES OF USAGE]](https://github.com/Paulo-Lopes-Estevao/ci-generator/examples) <- click here
+
 github-actions subcommand can be used to generate Build and Test Github Actions configuration files.
 
 #### Github Actions commands available
@@ -67,11 +69,15 @@ github-actions Golang example:
 cigen github-actions go -n myproject -b push main -a 1 -v 1.21.1
 ```
 
-github-actions Python example:
+[[EXEMPLES OF USAGE GOLANG]](https://github.com/Paulo-Lopes-Estevao/ci-generator/examples/github_action/golang.md) <- click here
+
+github-actions NodeJS example:
 
 ```bash
-cigen github-actions python -n myproject -b push main -a 1 -v 3.9.6
+cigen github-actions nodejs -n myproject -b push main -a 1 -v 14.17.3
 ```
+
+[[EXEMPLES OF USAGE NODEJS]](https://github.com/Paulo-Lopes-Estevao/ci-generator/examples/github_action/nodejs.md) <- click here
 
 ## Commands not yet available
 
