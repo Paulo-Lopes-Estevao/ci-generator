@@ -5,10 +5,10 @@ It's a command line tool that can be used to generate CI configuration files for
 
 Possible CI systems are:
 
-- [x] Github Actions
-- [ ] Jenkins
-- [ ] Docker
-- [ ] Gitlab CI
+* [x] GitHub Actions
+* [ ] Jenkins
+* [ ] Docker
+* [ ] Gitlab CI
 
 They can integrate with the following tools:
 
@@ -17,6 +17,29 @@ They can integrate with the following tools:
 - Test coverage
 - DockerFile
 - DockerCompose
+
+# Index
+
+* [ci generator](#ci-generator)
+* [Installation](#installation)
+* [Usage](#usage)
+  * [GitHub Actions](#github-actions)
+  * [Github Actions commands available](#github-actions-commands-available)
+    * [Go](#go)
+    * [NodeJS](#nodejs)
+  * [Commands not yet available](#commands-not-yet-available)
+      *  [Jenkins](#jenkins)
+      *  [Docker](#docker)
+      *  [Gitlab CI](#gitlab-ci)
+      *  [Docker Composer](#docker-composer)
+      *  [Python](#python)
+* [Installation - Development](#installation--development)
+  * [Docker [dev]](#docker-dev)
+  * [Docker Composer  [dev]](#docker-composer-dev)
+  * [Python [dev]](#python-dev)
+* [Contributing](#contributing)
+* [License](#license)
+
 
 ## Installation
 
@@ -55,13 +78,13 @@ Commands:
 
 ```
 
-### [[EXEMPLES OF USAGE]](examples) <- click here
+#### [[EXEMPLES OF USAGE]](examples) <- click here
 
 github-actions subcommand can be used to generate Build and Test Github Actions configuration files.
 
-#### Github Actions commands available
+### Github Actions commands available
 
-- go
+##### **Go**
 
 github-actions Golang example:
 
@@ -71,6 +94,8 @@ cigen github-actions go -n myproject -b push main -a 1 -v 1.21.1
 
 [[EXEMPLES OF USAGE GOLANG]](examples/github_action/golang.md) <- click here
 
+##### **NodeJS**
+
 github-actions NodeJS example:
 
 ```bash
@@ -79,7 +104,7 @@ cigen github-actions nodejs -n myproject -b push main -a 1 -v 14.17.3
 
 [[EXEMPLES OF USAGE NODEJS]](examples/github_action/nodejs.md) <- click here
 
-## Commands not yet available
+### Commands not yet available
 
 ### Jenkins
 
@@ -136,7 +161,50 @@ cigen gitlab-ci python -n myproject -b push main -a 1 -v 3.9.6
 ```
 
 <br>
-<br>
+
+## Installation - Development
+
+### Docker [dev]
+
+```bash
+docker build -t ci-generator .
+```
+
+```bash
+docker run -it --rm ci-generator cigen --help
+```
+
+### Docker Composer  [dev]
+
+```bash
+docker-compose up -d
+```
+
+```bash
+docker-compose run --rm ci-generator cigen --help
+```
+
+### Python [dev]
+
+```bash
+python3 -m venv venv
+```
+
+```bash
+source venv/bin/activate
+```
+
+```bash
+pip install -r requirements.txt
+```
+
+```bash
+pip install -e .
+```
+
+```bash
+cigen --help
+```
 
 **NOTE**: ci generator is not yet fully stable, so it's not recommended to use it in production. It's still in development.
 

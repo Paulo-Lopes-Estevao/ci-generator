@@ -1,6 +1,6 @@
 services:
 
-  cigen:
+  ci-generator:
     build:
       context: .
     ports:
