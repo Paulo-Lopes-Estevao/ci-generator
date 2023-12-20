@@ -1,0 +1,11 @@
+services:
+
+  ci-generator:
+    build:
+      context: .
+    ports:
+      - 8000:8000
+    develop:
+      watch:
+        - action: rebuild
+          command: pip install -U .
